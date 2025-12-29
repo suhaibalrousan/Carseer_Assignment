@@ -1,8 +1,95 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model VehicleCatalog.Web.Models.VehicleSearchViewModel
+@{
+    ViewData["Title"] = "Vehicle Catalog";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="hero-section">
+    <h1 class="hero-title">
+        <span class="gradient-text">Vehicle Catalog</span>
+    </h1>
+    <p class="hero-subtitle">Discover vehicle makes, types, and models from the NHTSA database</p>
 </div>
+
+<div class="search-container">
+    <div class="search-card">
+        <div class="card-header">
+            <h2>Search Vehicles</h2>
+            <p>Select a manufacturer and year to explore available vehicles</p>
+        </div>
+
+        <div class="search-form">
+            <div class="form-group">
+                <label for="makeSelect">
+                    <i class="icon">🚗</i> Vehicle Make
+                </label>
+                <select id="makeSelect" class="form-control">
+                    <option value="">Select a make...</option>
+                    @foreach (var make in Model.Makes)
+                    {
+                        <option value="@make.MakeId">@make.MakeName</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="yearInput">
+                    <i class="icon">📅</i> Model Year
+                </label>
+                <input type="number" id="yearInput" class="form-control" 
+                       placeholder="e.g., 2020" 
+                       min="1900" 
+                       max="@(DateTime.Now.Year + 2)" />
+                <small class="form-hint">Enter a year between 1900 and @(DateTime.Now.Year + 2)</small>
+            </div>
+
+            <button id="searchBtn" class="btn-primary">
+                <span class="btn-content">
+                    <i class="icon">🔍</i>
+                    <span>Search Vehicles</span>
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <div id="loadingIndicator" class="loading-indicator" style="display: none;">
+        <div class="spinner"></div>
+        <p>Loading vehicle data...</p>
+    </div>
+
+    <div id="resultsContainer" class="results-container" style="display: none;">
+        <div id="vehicleTypesSection" class="results-section" style="display: none;">
+            <h3 class="section-title">
+                <span class="icon-badge">🏷️</span>
+                Vehicle Types
+            </h3>
+            <div id="vehicleTypesList" class="cards-grid"></div>
+        </div>
+
+        <div id="vehicleModelsSection" class="results-section" style="display: none;">
+            <h3 class="section-title">
+                <span class="icon-badge">🚙</span>
+                Available Models
+            </h3>
+            <div id="vehicleModelsList" class="cards-grid models-grid"></div>
+        </div>
+    </div>
+
+    <div id="errorContainer" class="error-container" style="display: none;">
+        <div class="error-card">
+            <span class="error-icon">⚠️</span>
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <div id="noResultsContainer" class="no-results" style="display: none;">
+        <div class="no-results-card">
+            <span class="no-results-icon">🔍</span>
+            <h3>No Results Found</h3>
+            <p>We couldn't find any vehicles matching your search criteria.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/vehicle-search.js"></script>
+}

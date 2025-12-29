@@ -1,7 +1,31 @@
+using VehicleCatalog.Application.Services;
+using VehicleCatalog.Application.Mappings;
+using VehicleCatalog.Domain.Interfaces;
+using VehicleCatalog.Infrastructure.ExternalServices;
+using VehicleCatalog.Infrastructure.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add Memory Cache
+builder.Services.AddMemoryCache();
+
+// Add AutoMapper
+builder.Services.AddAutoMapper(typeof(VehicleMappingProfile));
+
+// Register HTTP Client for NHTSA API
+builder.Services.AddHttpClient<NHTSAApiClient>();
+
+// Register Application Services
+builder.Services.AddScoped<VehicleService>();
+
+// Register Infrastructure Services
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+
+// Add Health Checks
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -19,6 +43,8 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.MapHealthChecks("/health");
 
 app.MapControllerRoute(
     name: "default",
