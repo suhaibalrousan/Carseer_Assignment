@@ -1,8 +1,6 @@
-// Vehicle Search JavaScript
 (function() {
     'use strict';
 
-    // DOM Elements
     const makeSelect = document.getElementById('makeSelect');
     const yearInput = document.getElementById('yearInput');
     const searchBtn = document.getElementById('searchBtn');
@@ -16,11 +14,10 @@
     const errorMessage = document.getElementById('errorMessage');
     const noResultsContainer = document.getElementById('noResultsContainer');
 
-    // State
     let currentMakeId = null;
     let currentYear = null;
 
-    // Event Listeners
+
     searchBtn.addEventListener('click', handleSearch);
     yearInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
@@ -28,14 +25,11 @@
         }
     });
 
-    // Main search handler
     async function handleSearch() {
-        // Get values
         currentMakeId = parseInt(makeSelect.value);
         currentYear = parseInt(yearInput.value);
 
-        // Validation
-        if (!currentMakeId) {
+       if (!currentMakeId) {
             showError('Please select a vehicle make');
             return;
         }
@@ -45,18 +39,14 @@
             return;
         }
 
-        // Clear previous results
         hideAllSections();
         showLoading();
 
         try {
-            // Fetch vehicle types
             const types = await fetchVehicleTypes(currentMakeId);
-            
-            // Fetch models
+           
             const models = await fetchModels(currentMakeId, currentYear);
 
-            // Display results
             hideLoading();
             
             if (types && types.length > 0) {
@@ -71,7 +61,6 @@
                 showNoResults();
             } else {
                 resultsContainer.style.display = 'block';
-                // Smooth scroll to results
                 resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
@@ -82,7 +71,6 @@
         }
     }
 
-    // Fetch vehicle types from API
     async function fetchVehicleTypes(makeId) {
         const response = await fetch(`/Home/GetVehicleTypes?makeId=${makeId}`);
         if (!response.ok) {
@@ -91,7 +79,6 @@
         return await response.json();
     }
 
-    // Fetch models from API
     async function fetchModels(makeId, year) {
         const response = await fetch(`/Home/GetModels?makeId=${makeId}&year=${year}`);
         if (!response.ok) {
@@ -100,7 +87,6 @@
         return await response.json();
     }
 
-    // Display vehicle types
     function displayVehicleTypes(types) {
         vehicleTypesList.innerHTML = '';
         
@@ -118,7 +104,6 @@
         vehicleTypesSection.style.display = 'block';
     }
 
-    // Display models
     function displayModels(models) {
         vehicleModelsList.innerHTML = '';
         
@@ -139,7 +124,6 @@
         vehicleModelsSection.style.display = 'block';
     }
 
-    // UI Helper Functions
     function showLoading() {
         loadingIndicator.style.display = 'flex';
     }
@@ -168,7 +152,6 @@
         noResultsContainer.style.display = 'none';
     }
 
-    // Escape HTML to prevent XSS
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;

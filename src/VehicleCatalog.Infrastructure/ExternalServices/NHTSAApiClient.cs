@@ -11,7 +11,6 @@ public class NHTSAApiClient
     public NHTSAApiClient(HttpClient httpClient)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        _httpClient.BaseAddress = new Uri("https://vpic.nhtsa.dot.gov/api/vehicles/");
         
         _jsonOptions = new JsonSerializerOptions
         {

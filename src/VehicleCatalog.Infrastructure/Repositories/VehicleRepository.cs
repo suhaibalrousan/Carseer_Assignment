@@ -84,7 +84,7 @@ public class VehicleRepository : IVehicleRepository
         }
 
         var models = response.Results
-            .Where(m => !string.IsNullOrWhiteSpace(m.ModelName)) // Filter out empty model names
+            .Where(m => !string.IsNullOrWhiteSpace(m.ModelName))
             .Select(m => new VehicleModel(m.MakeId, m.ModelId, m.ModelName, year))
             .ToList();
 

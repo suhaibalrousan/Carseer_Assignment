@@ -5,8 +5,7 @@ public class VehicleMake
     public int MakeId { get; private set; }
     public string MakeName { get; private set; }
 
-    // Constructor for creating from external API
-    public VehicleMake(int makeId, string makeName)
+ public VehicleMake(int makeId, string makeName)
     {
         if (makeId <= 0)
             throw new ArgumentException("MakeId must be greater than zero", nameof(makeId));
@@ -18,6 +17,5 @@ public class VehicleMake
         MakeName = makeName.Trim();
     }
 
-    // Parameterless constructor for EF Core (if needed in future)
-    private VehicleMake() { }
+     private VehicleMake() { }
 }

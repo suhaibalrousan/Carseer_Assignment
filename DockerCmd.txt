@@ -1,0 +1,14 @@
+##Build the image##
+docker build -t vehiclecatalog:latest .
+
+##Run the container##
+docker run -d -p 5000:8080 --name vehiclecatalog-app vehiclecatalog:latest  >With uniqe name<
+
+##Remove Container##
+docker rm -f vehiclecatalog-app
+
+   ## Remove image##
+docker rmi vehiclecatalog:latest
+
+##View running containers##
+docker ps

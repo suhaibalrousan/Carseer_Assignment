@@ -6,38 +6,37 @@ using VehicleCatalog.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add Memory Cache
+
 builder.Services.AddMemoryCache();
 
-// Add AutoMapper
 builder.Services.AddAutoMapper(typeof(VehicleMappingProfile));
 
-// Register HTTP Client for NHTSA API
-builder.Services.AddHttpClient<NHTSAApiClient>();
+builder.Services.AddHttpClient<NHTSAApiClient>(client =>
+{
+    var baseUrl = builder.Configuration["NHTSAApi:BaseUrl"] 
+        ?? throw new InvalidOperationException("NHTSAApi:BaseUrl is not configured in appsettings.json");
+    client.BaseAddress = new Uri(baseUrl);
+});
 
-// Register Application Services
 builder.Services.AddScoped<VehicleService>();
 
-// Register Infrastructure Services
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
 
-// Add Health Checks
 builder.Services.AddHealthChecks();
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseRouting();
 
 app.UseAuthorization();
@@ -45,6 +44,7 @@ app.UseAuthorization();
 app.MapStaticAssets();
 
 app.MapHealthChecks("/health");
+app.MapGet("/health", () => Results.Ok("Healthy"));
 
 app.MapControllerRoute(
     name: "default",
