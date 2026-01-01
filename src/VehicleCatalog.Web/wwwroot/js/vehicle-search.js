@@ -2,6 +2,8 @@
     'use strict';
 
     const makeSelect = document.getElementById('makeSelect');
+    const makeSearch = document.getElementById('makeSearch');
+    const makeDropdown = document.getElementById('makeDropdown');
     const yearInput = document.getElementById('yearInput');
     const searchBtn = document.getElementById('searchBtn');
     const loadingIndicator = document.getElementById('loadingIndicator');
@@ -16,7 +18,126 @@
 
     let currentMakeId = null;
     let currentYear = null;
+    let highlightedIndex = -1;
 
+    const dropdownItems = makeDropdown.querySelectorAll('.dropdown-item');
+    
+    makeSearch.addEventListener('focus', function() {
+        showDropdown();
+        filterDropdown('');
+    });
+
+    makeSearch.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        filterDropdown(searchTerm);
+        showDropdown();
+    });
+
+    makeSearch.addEventListener('keydown', function(e) {
+        const visibleItems = Array.from(dropdownItems).filter(item => !item.classList.contains('hidden'));
+        
+        switch(e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                highlightedIndex = Math.min(highlightedIndex + 1, visibleItems.length - 1);
+                updateHighlight(visibleItems);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                highlightedIndex = Math.max(highlightedIndex - 1, 0);
+                updateHighlight(visibleItems);
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (highlightedIndex >= 0 && visibleItems[highlightedIndex]) {
+                    selectItem(visibleItems[highlightedIndex]);
+                }
+                break;
+            case 'Escape':
+                hideDropdown();
+                break;
+            case 'Tab':
+                hideDropdown();
+                break;
+        }
+    });
+
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', function() {
+            selectItem(this);
+        });
+
+        item.addEventListener('mouseenter', function() {
+            dropdownItems.forEach(i => i.classList.remove('highlighted'));
+            this.classList.add('highlighted');
+        });
+    });
+
+    function filterDropdown(searchTerm) {
+        let hasVisibleItems = false;
+        highlightedIndex = -1;
+        
+        dropdownItems.forEach(item => {
+            const text = item.getAttribute('data-text').toLowerCase();
+            if (text.includes(searchTerm)) {
+                item.classList.remove('hidden');
+                hasVisibleItems = true;
+            } else {
+                item.classList.add('hidden');
+            }
+            item.classList.remove('highlighted');
+        });
+
+        let noResultsMsg = makeDropdown.querySelector('.no-results-dropdown');
+        if (!hasVisibleItems) {
+            if (!noResultsMsg) {
+                noResultsMsg = document.createElement('div');
+                noResultsMsg.className = 'no-results-dropdown';
+                noResultsMsg.textContent = 'No makes found matching your search';
+                makeDropdown.appendChild(noResultsMsg);
+            }
+            noResultsMsg.style.display = 'block';
+        } else if (noResultsMsg) {
+            noResultsMsg.style.display = 'none';
+        }
+    }
+
+    function updateHighlight(visibleItems) {
+        dropdownItems.forEach(item => item.classList.remove('highlighted'));
+        if (visibleItems[highlightedIndex]) {
+            visibleItems[highlightedIndex].classList.add('highlighted');
+            visibleItems[highlightedIndex].scrollIntoView({ block: 'nearest' });
+        }
+    }
+
+    function selectItem(item) {
+        const value = item.getAttribute('data-value');
+        const text = item.getAttribute('data-text');
+        
+        makeSelect.value = value;
+        makeSearch.value = text;
+        
+        dropdownItems.forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+        
+        hideDropdown();
+        yearInput.focus();
+    }
+
+    function showDropdown() {
+        makeDropdown.classList.add('show');
+    }
+
+    function hideDropdown() {
+        makeDropdown.classList.remove('show');
+        highlightedIndex = -1;
+    }
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.searchable-select')) {
+            hideDropdown();
+        }
+    });
 
     searchBtn.addEventListener('click', handleSearch);
     yearInput.addEventListener('keypress', function(e) {

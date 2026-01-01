@@ -19,16 +19,26 @@
 
         <div class="search-form">
             <div class="form-group">
-                <label for="makeSelect">
+                <label for="makeSearch">
                     <i class="icon">🚗</i> Vehicle Make
                 </label>
-                <select id="makeSelect" class="form-control">
-                    <option value="">Select a make...</option>
-                    @foreach (var make in Model.Makes)
-                    {
-                        <option value="@make.MakeId">@make.MakeName</option>
-                    }
-                </select>
+                <div class="searchable-select" id="makeSelectContainer">
+                    <input type="text" 
+                           id="makeSearch" 
+                           class="form-control" 
+                           placeholder="Type to search makes..." 
+                           autocomplete="off" />
+                    <input type="hidden" id="makeSelect" name="makeSelect" />
+                    <div class="dropdown-list" id="makeDropdown">
+                        @foreach (var make in Model.Makes)
+                        {
+                            <div class="dropdown-item" data-value="@make.MakeId" data-text="@make.MakeName">
+                                @make.MakeName
+                            </div>
+                        }
+                    </div>
+                </div>
+                <small class="form-hint">Start typing to filter makes (e.g., "Toyota", "Ford")</small>
             </div>
 
             <div class="form-group">
